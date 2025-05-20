@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import '../data/mode_data.dart';
-import '../domain/smart_home_state.dart';
 import '../facade/smart_home_facade.dart';
 import 'components/device_icon.dart';
 import 'components/mode_switcher.dart';
@@ -144,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Facade Pattern Implementation',
+            'Fachada',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -152,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ),
           const SizedBox(height: 8),
           Text(
-            'This example demonstrates the Facade design pattern applied to a smart home system.',
+            'Este ejemplo demuestra el patrón de diseño de fachada aplicado a un sistema de casa inteligente.',
             style: TextStyle(
               color: Colors.grey[700],
             ),

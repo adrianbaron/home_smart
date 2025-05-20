@@ -1,4 +1,3 @@
-// facade/smart_home_api.dart
 import '../domain/smart_home_state.dart';
 import '../services/tv_api.dart';
 import '../services/audio_api.dart';
