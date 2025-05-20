@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import '../data/mode_data.dart';
 import '../domain/smart_home_state.dart';
@@ -55,7 +56,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             // Turn off other modes
             homeTheaterMode = false;
             streamingMode = false;
-            
           } else {
             _facade.stopGaming(_facade.state);
           }
@@ -73,6 +73,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           break;
       }
     });
+  }
+  
+  // Método para actualizar el estado de los modos basado en el estado actual del sistema
+  void _updateModeStates() {
+    final state = _facade.state;
+    
+    // Determinar qué modo está activo basado en el estado del sistema
+    homeTheaterMode = state.tvOn && state.netflixConnected && !state.gamingConsoleOn && !state.streamingCameraOn;
+    gamingMode = state.tvOn && state.gamingConsoleOn && !state.netflixConnected;
+    streamingMode = state.streamingCameraOn;
   }
   
   @override
@@ -120,6 +130,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           _buildStatusSection(),
           const SizedBox(height: 24),
           _buildDeviceControlSection(),
+          const SizedBox(height: 24),
+          _buildShutdownButton(),
         ],
       ),
     );
@@ -149,7 +161,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           FacadeExample(
             facade: _facade,
             state: _facade.state,
-            onStateChanged: () => setState(() {}),
+            onStateChanged: () => setState(() {
+              _updateModeStates();
+            }),
           ),
         ],
       ),
@@ -286,10 +300,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 setState(() {
                   if (_facade.state.tvOn) {
                     _facade.stopMovie(_facade.state);
-                    homeTheaterMode = false;
+                    _updateModeStates();
                   } else {
                     _facade.startMovie(_facade.state, 'Quick Play');
-                    homeTheaterMode = true;
+                    _updateModeStates();
                   }
                 });
               },
@@ -300,9 +314,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               color: Colors.orange,
               isActive: _facade.state.audioSystemOn,
               onTap: () {
-                // This would typically be handled through the facade
-                // For demo purposes, we're just showing the UI state
-                setState(() {});
+                setState(() {
+                  _facade.toggleAudio();
+                  _updateModeStates();
+                });
               },
             ),
             DeviceIcon(
@@ -313,6 +328,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               onTap: () {
                 setState(() {
                   _facade.toggleLights();
+                  _updateModeStates();
                 });
               },
             ),
@@ -325,10 +341,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 setState(() {
                   if (_facade.state.gamingConsoleOn) {
                     _facade.stopGaming(_facade.state);
-                    gamingMode = false;
+                    _updateModeStates();
                   } else {
                     _facade.startGaming(_facade.state, 'Quick Game');
-                    gamingMode = true;
+                    _updateModeStates();
                   }
                 });
               },
@@ -342,10 +358,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 setState(() {
                   if (_facade.state.streamingCameraOn) {
                     _facade.stopStreaming(_facade.state);
-                    streamingMode = false;
+                    _updateModeStates();
                   } else {
                     _facade.startStreaming(_facade.state);
-                    streamingMode = true;
+                    _updateModeStates();
                   }
                 });
               },
@@ -353,6 +369,34 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ],
         ),
       ],
+    );
+  }
+  
+  Widget _buildShutdownButton() {
+    return Center(
+      child: ElevatedButton.icon(
+        onPressed: () {
+          setState(() {
+            _facade.shutdownSystem();
+            // Actualizar estados de los modos
+            homeTheaterMode = false;
+            gamingMode = false;
+            streamingMode = false;
+          });
+        },
+        icon: const Icon(Icons.power_settings_new, color: Colors.white),
+        label: const Text(
+          'APAGAR TODO EL SISTEMA',
+          style: TextStyle(color: Colors.white),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
     );
   }
 }
